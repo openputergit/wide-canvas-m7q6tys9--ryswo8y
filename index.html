@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayEase - Neubrutalism Payment App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --shadow-color: #000;
+            --shadow-offset: 4px;
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #F8F7F1;
+        }
+        .neubrutalism {
+            border: 3px solid var(--shadow-color);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--shadow-color);
+            transition: all 0.2s ease;
+        }
+        .neubrutalism:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--shadow-color);
+        }
+        .transaction-item {
+            border-bottom: 2px solid #000;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4 md:p-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">PayEase</h1>
+            <p class="text-lg">Your Secure Payment Solution</p>
+        </header>
+
+        <!-- Balance Card -->
+        <div class="neubrutalism bg-[#FFE66D] p-6 mb-8 rounded-lg">
+            <p class="text-lg mb-2">Available Balance</p>
+            <h2 class="text-4xl font-bold">$2,458.50</h2>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <button class="neubrutalism bg-[#4ECDC4] p-4 rounded-lg text-white" onclick="showModal('send')">
+                <i class="bi bi-send text-2xl mb-2"></i>
+                <span class="block">Send Money</span>
+            </button>
+            <button class="neubrutalism bg-[#FF6B6B] p-4 rounded-lg text-white" onclick="showModal('request')">
+                <i class="bi bi-download text-2xl mb-2"></i>
+                <span class="block">Request</span>
+            </button>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="neubrutalism bg-white p-4 rounded-lg">
+            <h3 class="text-xl font-bold mb-4">Recent Transactions</h3>
+            <div id="transactions"></div>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div class="neubrutalism bg-white p-6 rounded-lg w-full max-w-md">
+                <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+                <form id="paymentForm" onsubmit="handlePayment(event)">
+                    <input type="email" placeholder="Recipient Email" class="neubrutalism w-full mb-4 p-2" required>
+                    <input type="number" placeholder="Amount" class="neubrutalism w-full mb-4 p-2" required>
+                    <textarea placeholder="Note (optional)" class="neubrutalism w-full mb-4 p-2"></textarea>
+                    <div class="flex gap-4">
+                        <button type="submit" class="neubrutalism bg-[#4ECDC4] text-white p-2 rounded flex-1">Confirm</button>
+                        <button type="button" onclick="hideModal()" class="neubrutalism bg-gray-200 p-2 rounded flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated database
+        let transactions = [
+            { id: 1, type: 'sent', amount: 50.00, to: 'john@example.com', date: '2023-11-15' },
+            { id: 2, type: 'received', amount: 25.00, from: 'sarah@example.com', date: '2023-11-14' },
+            { id: 3, type: 'sent', amount: 30.00, to: 'mike@example.com', date: '2023-11-13' }
+        ];
+
+        // Render transactions
+        function renderTransactions() {
+            const transactionsContainer = document.getElementById('transactions');
+            transactionsContainer.innerHTML = transactions.map(t => `
+                <div class="transaction-item">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">${t.type === 'sent' ? 'Sent to ' + t.to : 'Received from ' + t.from}</p>
+                            <p class="text-gray-600">${t.date}</p>
+                        </div>
+                        <p class="font-bold ${t.type === 'sent' ? 'text-red-500' : 'text-green-500'}">
+                            ${t.type === 'sent' ? '-' : '+'}$${t.amount.toFixed(2)}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+        function showModal(type) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            modal.classList.remove('hidden');
+            modalTitle.textContent = type === 'send' ? 'Send Money' : 'Request Money';
+        }
+
+        function hideModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        // Handle payment submission
+        function handlePayment(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newTransaction = {
+                id: transactions.length + 1,
+                type: 'sent',
+                amount: parseFloat(formData.get('amount')),
+                to: formData.get('email'),
+                date: new Date().toISOString().split('T')[0]
+            };
+            transactions.unshift(newTransaction);
+            renderTransactions();
+            hideModal();
+            event.target.reset();
+        }
+
+        // Initialize
+        renderTransactions();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
